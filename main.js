@@ -67,6 +67,55 @@ Background.prototype.draw = function (ctx) {
     Entity.prototype.draw.call(this);
 }
 
+function Bear(game) {
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/bear2.png"), 0, 0, 256, 256, 0.1, 64, true, true);
+    this.speed = 100;
+    this.ctx = game.ctx;
+    Entity.call(this, game, 0, 400);
+}
+Bear.prototype = new Entity();
+Bear.prototype.constructor = Bear;
+
+Bear.prototype.update = function () {
+    this.x += this.game.clockTick * this.speed;
+    if (this.x > 800) this.x = -230;
+    Entity.prototype.update.call(this);
+}
+
+Bear.prototype.draw = function(ctx){
+    this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y);
+    Entity.prototype.draw.call(this);
+}
+
+function Snowball(game) {
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/Snowball.png"), 0, 0, 150, 150, 1, 1, true, true);
+    this.speed = 100;
+    this.ctx = game.ctx;
+    this.falling = false;
+    Entity.call(this, game, 0, 25);
+}
+Snowball.prototype = new Entity();
+Snowball.prototype.constructor = Bear;
+
+Snowball.prototype.update = function () {
+    if (this.game.space) this.falling = true;
+    if (this.falling) {
+        this.x += this.game.clockTick * this.speed;
+        this.y += this.game.clockTick * this.speed*20;
+        if (this.y > 400) this.falling = false;
+    } else {
+        this.y = 25;
+        this.x += this.game.clockTick * this.speed;
+        if (this.x > 800) this.x = -230;
+    }
+    Entity.prototype.update.call(this);
+}
+
+Snowball.prototype.draw = function(ctx){
+    this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y);
+    Entity.prototype.draw.call(this);
+}
+
 /*function Unicorn(game) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/RobotUnicorn.png"), 0, 0, 206, 110, 0.02, 30, true, true);
     this.jumpAnimation = new Animation(ASSET_MANAGER.getAsset("./img/RobotUnicorn.png"), 618, 334, 174, 138, 0.02, 40, false, true);
@@ -114,6 +163,8 @@ Unicorn.prototype.draw = function (ctx) {
 var ASSET_MANAGER = new AssetManager();
 
 ASSET_MANAGER.queueDownload("./img/RobotUnicorn.png");
+ASSET_MANAGER.queueDownload("./img/bear2.png");
+ASSET_MANAGER.queueDownload("./img/Snowball.png");
 
 ASSET_MANAGER.downloadAll(function () {
     console.log("starting up da sheild");
@@ -123,9 +174,13 @@ ASSET_MANAGER.downloadAll(function () {
     var gameEngine = new GameEngine();
     var bg = new Background(gameEngine);
     //var unicorn = new Unicorn(gameEngine);
+    var bear = new Bear(gameEngine);
+    var snowball = new Snowball(gameEngine);
+    
 
     gameEngine.addEntity(bg);
-    //gameEngine.addEntity(unicorn);
+    gameEngine.addEntity(bear);
+    gameEngine.addEntity(snowball)
  
     gameEngine.init(ctx);
     gameEngine.start();
